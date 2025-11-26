@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "id": "rapport-dystopie-01",
+      "title": "Rapport de dérive dystopique // Zone A",
+      "file": "rapport-dystopie-01.md",
+      "tags": ["dystopie", "surveillance", "rapport"],
+      "level": "HIGH",
+      "created": "2025-11-27",
+      "preview": "Synthèse des signaux faibles relevés dans la Zone A.",
+      "meta": {
+        "source": "toi",
+        "version": 1
+      }
+    },
+    {
+      "id": "mission-pour-s",
+      "title": "Mission publique pour S",
+      "file": "mission-pour-s.md",
+      "tags": ["jeu", "mission", "S"],
+      "level": "LOW",
+      "created": "2025-11-27",
+      "preview": "Instructions à publier quelque part sur le net.",
+      "meta": {
+        "where_posted": "à renseigner…",
+        "status": "draft"
+      }
+    }
+  ]
+}
