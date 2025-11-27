@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>GHOSTNET // Dark Grid Explorer</title>
+  <title>GHOSTNET v2 // Dark Grid Explorer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -44,10 +44,10 @@
 
     .app-shell {
       display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-columns: 270px minmax(0, 1fr);
       gap: 16px;
       width: 100%;
-      max-width: 1300px;
+      max-width: 1320px;
       max-height: 100%;
     }
 
@@ -207,8 +207,11 @@
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 4px;
-      transition: transform var(--transition-fast), border-color var(--transition-fast),
-                  box-shadow var(--transition-fast), background var(--transition-fast);
+      transition:
+        transform var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast);
     }
 
     .list-item:hover {
@@ -384,7 +387,7 @@
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(0, 2.3fr) minmax(260px, 1.2fr);
+      grid-template-columns: minmax(0, 2.4fr) minmax(260px, 1.1fr);
       gap: 12px;
     }
 
@@ -502,7 +505,9 @@
       margin-bottom: 0.15em;
     }
 
-    .view-body img, .view-body video, .view-body iframe {
+    .view-body img,
+    .view-body video,
+    .view-body iframe {
       max-width: 100%;
       border-radius: 10px;
       margin: 0.4em 0;
@@ -510,7 +515,7 @@
       background: #000;
     }
 
-    /* META */
+    /* META / SCANNER */
 
     .meta-grid {
       padding: 8px 10px 10px;
@@ -622,6 +627,67 @@
     .small-text {
       font-size: 0.68rem;
     }
+
+    /* Scanner en bas du panneau méta */
+
+    .scanner-box {
+      margin-top: 6px;
+      border-top: 1px dashed rgba(74, 98, 151, 0.7);
+      padding-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .scanner-input-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+    }
+
+    .scanner-input-row input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(77, 102, 158, 0.9);
+      background: rgba(4, 9, 22, 0.98);
+      color: var(--text-main);
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .scanner-input-row input:focus {
+      outline: none;
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 1px rgba(62, 197, 255, 0.4);
+    }
+
+    .scanner-log {
+      background: rgba(3, 8, 21, 0.96);
+      border-radius: 8px;
+      border: 1px solid rgba(71, 96, 148, 0.95);
+      padding: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      max-height: 140px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .scanner-iframe-wrapper {
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(71, 96, 148, 0.95);
+      overflow: hidden;
+      height: 140px;
+      background: #000;
+    }
+
+    .scanner-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -637,7 +703,7 @@
         <div class="status-strip">
           <div class="status-dot"></div>
           <div class="status-label">phantom uplink stable</div>
-          <div class="status-addr" id="statusAddr">null://boot</div>
+          <div class="status-addr" id="statusAddr">ghost://boot</div>
         </div>
 
         <div class="sidebar-section-label">Noeuds fantômes</div>
@@ -670,11 +736,11 @@
           <div class="addr-bar">
             <div class="addr-icon"></div>
             <span class="addr-label">addr</span>
-            <span class="addr-value" id="addrCurrent">ghost://null</span>
+            <span class="addr-value" id="addrCurrent">ghost://boot</span>
           </div>
           <div class="topbar-right">
-            <button class="btn btn-ghost" id="randomNodeBtn">⚡ random node</button>
-            <span class="small-text muted">tout est faux, tout est local</span>
+            <button class="btn btn-ghost" id="randomNodeBtn">⚡ random</button>
+            <span class="small-text muted">simu locale, aucun vrai dark web</span>
           </div>
         </div>
 
@@ -686,46 +752,52 @@
               <div class="view-header-pill" id="viewType">SYSTEM.BOOT</div>
             </div>
             <div class="view-body" id="viewBody">
-              <h1>GHOSTNET // Explorateur de dark web fantasmé</h1>
+              <h1>GHOSTNET v2 // Explorateur fantasmé</h1>
               <p>
-                Tout ce que tu vois ici tourne
-                <strong>hors ligne</strong>, depuis ta clé USB ou ton disque.
-                Aucune connexion n’est établie : tu navigues un
-                <em>simulacre</em> de réseau clandestin.
+                Ici, tout tourne <strong>hors ligne</strong> et en statique : pas de connexion Tor, pas de scan massif,
+                juste un terrain de jeu pour réfléchir et raconter des histoires de réseau sombre.
               </p>
               <p>
-                À gauche : des noeuds fantômes (faux sites, faux boards, faux leaks).  
-                En dessous : ton propre <strong>coffre d’archives</strong> en Markdown
-                (<code>/data/*.md</code>) avec métadonnées (<code>/data/index.json</code>).
-              </p>
-              <p>
-                Tu peux y glisser :
+                Tu as trois zones :
               </p>
               <ul>
-                <li>des récits, manifestes, rapports dystopiques;</li>
-                <li>des images, PDFs, vidéos intégrées dans ton Markdown;</li>
-                <li>toutes les pistes que tu veux disséminer pour
-                  retrouver « S » quelque part sur le réseau.</li>
+                <li><strong>Noeuds fantômes</strong> : faux sites, faux boards, faux leaks.</li>
+                <li><strong>Archives locales</strong> : tes fichiers Markdown dans <code>/data</code>.</li>
+                <li><strong>Scanner</strong> (panneau de droite) : tu peux y taper une URL et l'ouvrir comme si tu "sondais" le web.</li>
               </ul>
               <p>
-                Commence par cliquer un noeud à gauche ou ajouter tes propres fichiers
-                dans <code>/data/</code>, puis mets à jour <code>index.json</code>.
+                Pour que la partie &laquo; Archives locales &raquo; fonctionne, il faut un mini serveur HTTP
+                (les navigateurs bloquent la lecture de fichiers locaux avancée via <code>file://</code>).
               </p>
-              <pre><code>/data/
-  index.json        # métadonnées & liens vers tes .md
-  dossier-secret.md # ton contenu riche (images, pdf, vidéo…)
-  autre-fichier.md  # etc.</code></pre>
+              <pre><code>cd ghostnet
+python -m http.server 8000
+# puis ouvrir http://localhost:8000 dans ton navigateur</code></pre>
             </div>
           </section>
 
-          <!-- META VIEW -->
+          <!-- META + SCANNER -->
           <aside class="view-meta">
             <div class="view-header">
-              <div class="view-title">Méta / Analyse</div>
+              <div class="view-title">Méta / Scanner</div>
               <div class="view-header-pill" id="metaHeaderMode">IDLE</div>
             </div>
             <div class="meta-grid" id="metaGrid">
-              <!-- rempli en JS -->
+              <!-- rempli par JS -->
+            </div>
+
+            <div class="scanner-box">
+              <div class="meta-label">Scanner web (safe)</div>
+              <div class="meta-note">
+                C'est juste un <strong>afficheur</strong> : ton navigateur va sur l'URL, rien n'est "hacké".
+              </div>
+              <div class="scanner-input-row">
+                <input id="scanUrlInput" placeholder="https://exemple.org" />
+                <button class="btn" id="scanBtn">probe</button>
+              </div>
+              <div class="scanner-log" id="scanLog"></div>
+              <div class="scanner-iframe-wrapper">
+                <iframe class="scanner-iframe" id="scanFrame" sandbox=""></iframe>
+              </div>
             </div>
           </aside>
         </div>
@@ -734,7 +806,7 @@
   </div>
 
   <script>
-    // === Données des faux sites (noeuds fantômes) ===========================
+    // ==== Données de faux sites ============================================
     const ghostNodes = [
       {
         id: "market_echo",
@@ -747,19 +819,19 @@
         content: `
 # ECHO-MARKT v3
 
-> &laquo;&nbsp;si c'est gratuit, c'est toi le produit — si tu paies, c'est quand même toi le produit&nbsp;&raquo;
+> « si c'est gratuit, c'est toi le produit — si tu paies, c'est quand même toi le produit »
 
-Pseudo place de marché dédiée &agrave; tout ce qui ne devrait pas exister.  
-Ici, on ne vend rien : on montre **à quoi ressemblerait** un monde o&ugrave; tout est &agrave; vendre.
+Pseudo place de marché dédiée à tout ce qui ne devrait pas exister.  
+Ici, on ne vend rien : on montre **à quoi ressemblerait** un monde où tout est à vendre.
 
 ---
 
 ## Modules simulés
 
-- Jeux de données de suivi de masse (&laquo;anonymisés&raquo;).
+- Jeux de données de suivi de masse (« anonymisés »).
 - Profils psychologiques prédictifs.
 - Modèles de scoring social opaques.
-- &laquo;Optimisation&raquo; de productivité basée sur la surveillance totale.
+- « Optimisation » de productivité basée sur la surveillance totale.
 
 ---
 
@@ -792,10 +864,10 @@ Poste quelque chose **quelque part** sur le net, sous n'importe quel pseudo :
 
 - un fragment de texte cryptique,
 - une image glitched,
-- un lien vers un fichier hébergé &quot;par hasard&quot;.
+- un lien vers un fichier hébergé "par hasard".
 
 Note seulement ici (dans ton Markdown perso) **l'URL que toi seul·e connais**.  
-Un jour, quelqu'un qui se fait appeler &laquo;S&raquo; tombera peut-être dessus.
+Un jour, quelqu'un qui se fait appeler « S » tombera peut-être dessus.
         `
       },
       {
@@ -830,18 +902,15 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       }
     ];
 
-    // === État runtime ======================================================
+    // ==== Etat =============================================================
     const state = {
-      current: null,       // {type: 'node'|'vault', id: ...}
-      vaultIndex: { entries: [] },  // index.json chargé
+      current: null,
+      vaultIndex: { entries: [] },
       filterTag: null
     };
 
-    // === Utilitaires =======================================================
-
-    function $(id) {
-      return document.getElementById(id);
-    }
+    // ==== Utils ============================================================
+    const $ = (id) => document.getElementById(id);
 
     function formatDate(iso) {
       if (!iso) return "n/a";
@@ -855,42 +924,41 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
     }
 
     function escapeHtml(str) {
-      return str
+      return String(str)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
 
-    // Mini parseur Markdown (suffisant pour notes "hacker")
     function renderMarkdown(md) {
       if (!md) return "";
       let html = md.replace(/\r\n/g, "\n");
 
-      // Code fences ```
+      // ```code```
       html = html.replace(/```([\s\S]*?)```/g, (m, code) => {
         return "<pre><code>" + escapeHtml(code.trim()) + "</code></pre>";
       });
 
-      // Titres
+      // titres
       html = html.replace(/^### (.*)$/gm, "<h3>$1</h3>");
       html = html.replace(/^## (.*)$/gm, "<h2>$1</h2>");
       html = html.replace(/^# (.*)$/gm, "<h1>$1</h1>");
 
-      // Gras & italique
+      // gras / italique
       html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
       html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-      // Liens
-      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
-
-      // Images
+      // images
       html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" />');
 
-      // Paragraphes
+      // liens
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+
+      // listes + paragraphes
       const lines = html.split("\n");
       let out = "";
       let inList = false;
-      lines.forEach(line => {
+      for (const line of lines) {
         if (/^\s*[-*] /.test(line)) {
           if (!inList) {
             inList = true;
@@ -903,13 +971,17 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
             inList = false;
             out += "</ul>";
           }
-          if (line.trim().length === 0 || /^<h[1-3]>/.test(line) || /^<pre>/.test(line)) {
+          if (
+            line.trim().length === 0 ||
+            /^<h[1-3]>/.test(line) ||
+            /^<pre>/.test(line)
+          ) {
             out += line;
           } else {
             out += "<p>" + line + "</p>";
           }
         }
-      });
+      }
       if (inList) out += "</ul>";
       return out;
     }
@@ -921,8 +993,12 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       el.classList.add("flash");
     }
 
-    // === Rendu de la sidebar ==============================================
+    function setAddr(str) {
+      $("addrCurrent").textContent = str;
+      $("statusAddr").textContent = str;
+    }
 
+    // ==== Sidebar ==========================================================
     function renderNodesList() {
       const container = $("nodesList");
       const ul = document.createElement("ul");
@@ -1013,25 +1089,41 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
 
     function updateActiveListItem() {
       const all = document.querySelectorAll(".list-item");
-      all.forEach(li => {
-        li.classList.remove("active");
-      });
+      all.forEach(li => li.classList.remove("active"));
       if (!state.current) return;
       const sel = `.list-item[data-kind="${state.current.kind}"][data-id="${state.current.id}"]`;
       const active = document.querySelector(sel);
       if (active) active.classList.add("active");
     }
 
-    // === Rendu des vues ====================================================
-
-    function setAddr(str) {
-      $("addrCurrent").textContent = str;
-      $("statusAddr")..textContent = str;
+    // ==== META RENDER ======================================================
+    function attachTagHandlers() {
+      const tags = document.querySelectorAll(".meta-tags .tag");
+      tags.forEach(tagEl => {
+        tagEl.addEventListener("click", () => {
+          const value = tagEl.textContent.trim();
+          if (!value) return;
+          if (state.filterTag === value) {
+            state.filterTag = null;
+          } else {
+            state.filterTag = value;
+          }
+          renderVaultList();
+          if (state.filterTag) {
+            const all = document.querySelectorAll(".meta-tags .tag");
+            all.forEach(t => {
+              if (t.textContent.trim() === state.filterTag) {
+                t.classList.add("active");
+              }
+            });
+          }
+        });
+      });
     }
 
     function renderMetaForNode(node) {
-      const meta = $("metaGrid");
       $("metaHeaderMode").textContent = "NODE";
+      const meta = $("metaGrid");
 
       const tagsHtml = (node.labels || [])
         .map(t => `<span class="tag">${t}</span>`)
@@ -1065,15 +1157,15 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
           <div class="meta-value meta-json">${escapeHtml(JSON.stringify(node, null, 2))}</div>
         </div>
         <div class="meta-row meta-note">
-          Tout ce noeud est une fiction locale. Aucune requête réseau n'est effectuée.
+          Noeud 100 % fictif, aucune requête réseau réelle.
         </div>
       `;
       attachTagHandlers();
     }
 
     function renderMetaForVault(entry) {
-      const meta = $("metaGrid");
       $("metaHeaderMode").textContent = "VAULT";
+      const meta = $("metaGrid");
 
       const tagsHtml = (entry.tags || [])
         .map(t => `<span class="tag">${t}</span>`)
@@ -1110,7 +1202,7 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
           <button class="btn btn-ghost small-text" id="copyMetaBtn">copier meta JSON</button>
         </div>
         <div class="meta-row meta-note">
-          Pour modifier ces métadonnées, édite <code>/data/index.json</code> (ou exporte &amp; réimporte depuis ce panneau).
+          Modifie <code>/data/index.json</code> ou passe par export/import pour mettre à jour ces infos.
         </div>
       `;
       attachTagHandlers();
@@ -1121,39 +1213,15 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
           try {
             navigator.clipboard.writeText(JSON.stringify(entry, null, 2));
             copyBtn.textContent = "copié ✓";
-            setTimeout(() => (copyBtn.textContent = "copier meta JSON"), 1200);
           } catch {
             copyBtn.textContent = "échec copie";
-            setTimeout(() => (copyBtn.textContent = "copier meta JSON"), 1200);
           }
+          setTimeout(() => (copyBtn.textContent = "copier meta JSON"), 1200);
         });
       }
     }
 
-    function attachTagHandlers() {
-      const tags = document.querySelectorAll(".meta-tags .tag");
-      tags.forEach(tagEl => {
-        tagEl.addEventListener("click", () => {
-          const value = tagEl.textContent.trim();
-          if (!value) return;
-          if (state.filterTag === value) {
-            state.filterTag = null;
-          } else {
-            state.filterTag = value;
-          }
-          renderVaultList();
-          if (state.filterTag) {
-            const all = document.querySelectorAll(".meta-tags .tag");
-            all.forEach(t => {
-              if (t.textContent.trim() === state.filterTag) t.classList.add("active");
-            });
-          }
-        });
-      });
-    }
-
-    // Selection
-
+    // ==== Sélection ========================================================
     function selectNode(kind, id) {
       state.current = { kind, id };
       updateActiveListItem();
@@ -1161,7 +1229,6 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       if (kind === "node") {
         const node = ghostNodes.find(n => n.id === id);
         if (!node) return;
-
         $("viewTitle").textContent = node.name;
         $("viewType").textContent = "NODE.FAKE";
         $("viewBody").innerHTML = renderMarkdown(node.content);
@@ -1195,16 +1262,15 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
             Impossible de charger <code>${entry.file}</code> dans <code>/data/</code>.
           </p>
           <p class="muted small-text">
-            Vérifie que le fichier existe vraiment à cet emplacement.  
-            Sur certains navigateurs, l'ouverture directe via <code>file://</code> peut bloquer <code>fetch</code> :
-            dans ce cas, lance un mini serveur local (ex: <code>python -m http.server</code>) dans ce dossier.
+            Si tu as ouvert le fichier en <code>file://</code>, ton navigateur bloque les lectures avancées.  
+            Lance un mini serveur : <code>python -m http.server</code> dans le dossier <code>ghostnet</code>,
+            puis visite <code>http://localhost:8000</code>.
           </p>
         `;
       }
     }
 
-    // === Chargement de /data/index.json ====================================
-
+    // ==== /data/index.json ================================================
     async function loadIndexJson() {
       try {
         const res = await fetch("./data/index.json");
@@ -1224,15 +1290,14 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
             </div>
           </div>
           <div class="meta-row meta-note">
-            Crée un dossier <code>data/</code> à côté de ce fichier <code>index.html</code>,
-            puis ajoute un <code>index.json</code> conforme au modèle fourni.
+            Crée <code>data/index.json</code> avec un champ <code>entries: []</code>
+            et ajoute-y tes items.
           </div>
         `;
       }
     }
 
-    // === Export / import index.json ========================================
-
+    // ==== Export / import ==================================================
     function exportIndex() {
       const blob = new Blob(
         [JSON.stringify(state.vaultIndex, null, 2)],
@@ -1261,12 +1326,8 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
             <div class="meta-row">
               <div class="meta-label">INDEX</div>
               <div class="meta-value">
-                index.json importé en mémoire (pense à l'enregistrer sur ta clé si tu veux le garder).
+                index.json importé en mémoire (${json.entries.length} entrées).
               </div>
-            </div>
-            <div class="meta-row">
-              <div class="meta-label">ENTRIES</div>
-              <div class="meta-value">${json.entries.length} éléments</div>
             </div>
           `;
           flashElement($("metaGrid"));
@@ -1281,8 +1342,48 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       reader.readAsText(file);
     }
 
-    // === Divers ==============================================================
+    // ==== Scanner web (safe) ==============================================
+    function logScan(msg) {
+      const logEl = $("scanLog");
+      const now = new Date().toISOString().split("T")[1].replace("Z", "");
+      logEl.textContent += "[" + now + "] " + msg + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
 
+    function normalizeUrl(str) {
+      let u = (str || "").trim();
+      if (!u) return null;
+      if (!/^https?:\/\//i.test(u)) {
+        u = "https://" + u;
+      }
+      return u;
+    }
+
+    function initScanner() {
+      const input = $("scanUrlInput");
+      const btn = $("scanBtn");
+      const frame = $("scanFrame");
+
+      btn.addEventListener("click", () => {
+        const raw = input.value;
+        const url = normalizeUrl(raw);
+        if (!url) {
+          logScan("ERR: URL vide.");
+          return;
+        }
+        frame.src = url;
+        logScan("probe → " + url);
+        setAddr("scan://" + url);
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          btn.click();
+        }
+      });
+    }
+
+    // ==== Divers ===========================================================
     function randomNode() {
       const all = [
         ...ghostNodes.map(n => ({ kind: "node", id: n.id })),
@@ -1293,17 +1394,15 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       selectNode(pick.kind, pick.id);
     }
 
-    // === Init ===============================================================
-
     function init() {
       renderNodesList();
       loadIndexJson();
-
       $("exportIndexBtn").addEventListener("click", exportIndex);
       $("importIndexInput").addEventListener("change", e => {
         handleImportIndex(e.target.files[0]);
       });
       $("randomNodeBtn").addEventListener("click", randomNode);
+      initScanner();
     }
 
     document.addEventListener("DOMContentLoaded", init);
