@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "id": "rapport-dystopie-01",
+      "title": "Rapport de dérive dystopique // Zone A",
+      "file": "rapport-dystopie-01.md",
+      "tags": ["dystopie", "surveillance", "rapport"],
+      "level": "HIGH",
+      "created": "2025-11-27",
+      "preview": "Synthèse de signaux faibles dans la zone A.",
+      "meta": {
+        "source": "terrain",
+        "version": 1
+      }
+    },
+    {
+      "id": "mission-pour-s",
+      "title": "Mission publique pour S",
+      "file": "mission-pour-s.md",
+      "tags": ["jeu", "mission", "S"],
+      "level": "LOW",
+      "created": "2025-11-27",
+      "preview": "Instructions à poster quelque part sur le net.",
+      "meta": {
+        "status": "draft"
+      }
+    },
+    {
+      "id": "journal-technique",
+      "title": "Journal technique du réseau fantôme",
+      "file": "journal-technique.md",
+      "tags": ["log", "infra", "meta"],
+      "level": "MEDIUM",
+      "created": "2025-11-27",
+      "preview": "Notes sur la topologie imaginaire de GHOSTNET.",
+      "meta": {
+        "nodes": 3,
+        "format": "markdown"
+      }
+    }
+  ]
+}
