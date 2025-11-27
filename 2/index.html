@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>GHOSTNET v3 // Dark Grid Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/ghostnet.css" />
+  <script src="js/ghostnet.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="panel">
+      <div class="sidebar-inner">
+        <header class="brand">
+          <div class="brand-title">[ GHOST<span>NET</span> // GRID ]</div>
+          <div class="brand-badge">LOCAL / OFFLINE</div>
+        </header>
+
+        <div class="status-strip">
+          <div class="status-dot"></div>
+          <div class="status-label">phantom uplink stable</div>
+          <div class="status-addr" id="statusAddr">ghost://boot</div>
+        </div>
+
+        <div class="sidebar-section-label">Noeuds fantômes</div>
+        <div class="sidebar-scroll" id="nodesList"></div>
+
+        <div class="sidebar-section-label">Archives locales (Markdown)</div>
+        <div class="sidebar-scroll" id="vaultList"></div>
+
+        <footer class="sidebar-footer">
+          <button class="btn" id="exportIndexBtn">
+            ⬇︎ export index.json
+          </button>
+
+          <label class="btn btn-ghost">
+            ⬆︎ importer
+            <input type="file" id="importIndexInput" accept="application/json" />
+          </label>
+
+          <span class="small-text muted">
+            /data/index.json · /data/*.md
+          </span>
+        </footer>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="panel">
+      <div class="main-inner">
+        <div class="topbar">
+          <div class="addr-bar">
+            <div class="addr-icon"></div>
+            <span class="addr-label">addr</span>
+            <span class="addr-value" id="addrCurrent">ghost://boot</span>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-ghost" id="randomNodeBtn">⚡ random</button>
+            <span class="small-text muted">simu locale, aucun vrai dark web</span>
+          </div>
+        </div>
+
+        <div class="view-wrapper">
+          <!-- MAIN VIEW -->
+          <section class="view-main">
+            <div class="view-header">
+              <div class="view-title" id="viewTitle">Boot / README</div>
+              <div class="view-header-pill" id="viewType">SYSTEM.BOOT</div>
+            </div>
+            <div class="view-body" id="viewBody">
+              <h1>GHOSTNET v3 // Explorateur fantasmé</h1>
+              <p>
+                Ici, tout tourne <strong>hors ligne</strong> et en statique : pas de connexion Tor, pas de scan massif,
+                juste un terrain de jeu pour réfléchir et raconter des histoires de réseau sombre.
+              </p>
+              <p>
+                Tu as trois zones :
+              </p>
+              <ul>
+                <li><strong>Noeuds fantômes</strong> : faux sites, faux boards, faux leaks.</li>
+                <li><strong>Archives locales</strong> : tes fichiers Markdown dans <code>/data</code>.</li>
+                <li><strong>Scanner + visionneuse de fichiers</strong> (panneau de droite) :
+                  tu peux y taper une URL ou charger un fichier local.</li>
+              </ul>
+              <p>
+                Pour que la partie &laquo; Archives locales &raquo; fonctionne, il faut un mini serveur HTTP
+                (les navigateurs bloquent la lecture de fichiers locaux avancée via <code>file://</code>).
+              </p>
+              <pre><code>cd ghostnet
+python -m http.server 8000
+# puis ouvrir http://localhost:8000 dans ton navigateur</code></pre>
+            </div>
+          </section>
+
+          <!-- META + SCANNER + VIEWER -->
+          <aside class="view-meta">
+            <div class="view-header">
+              <div class="view-title">Méta / Scanner / Fichiers</div>
+              <div class="view-header-pill" id="metaHeaderMode">IDLE</div>
+            </div>
+            <div class="meta-grid" id="metaGrid">
+              <!-- rempli par JS -->
+            </div>
+
+            <!-- Scanner web -->
+            <div class="scanner-box">
+              <div class="meta-label">Scanner web (safe)</div>
+              <div class="meta-note">
+                C'est juste un <strong>afficheur</strong> : ton navigateur va sur l'URL, rien n'est "hacké".
+              </div>
+              <div class="scanner-input-row">
+                <input id="scanUrlInput" placeholder="https://exemple.org" />
+                <button class="btn" id="scanBtn">probe</button>
+              </div>
+              <div class="scanner-size-row">
+                <span class="small-text muted">taille cadre</span>
+                <input type="range" id="scanSizeRange" min="140" max="420" value="240" />
+              </div>
+              <div class="scanner-log" id="scanLog"></div>
+              <div class="scanner-iframe-wrapper">
+                <iframe class="scanner-iframe" id="scanFrame" sandbox=""></iframe>
+              </div>
+            </div>
+
+            <!-- Visionneuse de fichiers -->
+            <div class="viewer-box">
+              <div class="meta-label">Visionneuse de fichiers</div>
+              <div class="meta-note">
+                Sélectionne un fichier (image, PDF, vidéo, audio, texte…) pour l'inspecter.  
+                Les métadonnées sont stockées dans un <strong>sidecar JSON</strong> que tu peux modifier et exporter.
+              </div>
+
+              <div class="viewer-input-row">
+                <label class="btn btn-ghost">
+                  choisir fichier
+                  <input type="file" id="fileInput" />
+                </label>
+                <button class="btn btn-ghost small-text" id="fileFullscreenBtn">plein écran</button>
+                <span class="small-text muted" id="fileNameLabel">aucun fichier</span>
+              </div>
+
+              <!-- conteneurs dock -->
+              <div id="viewerMetaContainer">
+                <div class="viewer-meta" id="fileMeta">
+                  aucun fichier chargé
+                </div>
+              </div>
+
+              <div id="viewerPreviewContainer">
+                <div class="viewer-preview" id="filePreview">
+                  <div class="small-text muted">prévisualisation vide</div>
+                </div>
+              </div>
+
+              <div class="meta-actions">
+                <button class="btn btn-ghost small-text" id="exportSidecarBtn">exporter sidecar.json</button>
+              </div>
+
+              <div id="viewerSidecarContainer">
+                <textarea id="fileSidecar" class="viewer-sidecar" spellcheck="false">
+{
+  "info": "sidecar JSON pour tes métadonnées (exif virtuel, notes PDF, tags, etc.)"
+}
+                </textarea>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- OVERLAY PLEIN ÉCRAN POUR LA VISIONNEUSE DE FICHIERS -->
+  <div id="fileFullscreenOverlay" class="viewer-fullscreen-overlay hidden">
+    <div class="viewer-fullscreen-inner">
+      <div class="viewer-fullscreen-header">
+        <div class="viewer-fullscreen-title" id="fsFileTitle">
+          FILE // FULLSCREEN VIEW
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span class="small-text muted" id="fsFileInfo">–</span>
+          <button class="btn btn-ghost small-text" id="fsCloseBtn">fermer</button>
+        </div>
+      </div>
+
+      <div class="viewer-fullscreen-main">
+        <div id="fsFilePreviewContainer">
+          <!-- #filePreview est déplacé ici en plein écran -->
+        </div>
+      </div>
+
+      <div class="viewer-fullscreen-side">
+        <div id="fsFileMetaContainer">
+          <!-- #fileMeta est déplacé ici -->
+        </div>
+        <div id="fsFileSidecarContainer">
+          <!-- #fileSidecar est déplacé ici -->
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
