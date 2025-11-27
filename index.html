@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>GHOSTNET v2 // Dark Grid Explorer</title>
+  <title>GHOSTNET v3 // Dark Grid Explorer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -515,7 +515,7 @@
       background: #000;
     }
 
-    /* META / SCANNER */
+    /* META / SCANNER / VIEWER */
 
     .meta-grid {
       padding: 8px 10px 10px;
@@ -628,8 +628,6 @@
       font-size: 0.68rem;
     }
 
-    /* Scanner en bas du panneau méta */
-
     .scanner-box {
       margin-top: 6px;
       border-top: 1px dashed rgba(74, 98, 151, 0.7);
@@ -669,17 +667,27 @@
       padding: 6px;
       font-family: var(--font-mono);
       font-size: 0.68rem;
-      max-height: 140px;
+      max-height: 110px;
       overflow: auto;
       white-space: pre-wrap;
     }
 
+    .scanner-size-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scanner-size-row input[type="range"] {
+      flex: 1;
+    }
+
     .scanner-iframe-wrapper {
-      margin-top: 6px;
+      margin-top: 4px;
       border-radius: 10px;
       border: 1px solid rgba(71, 96, 148, 0.95);
       overflow: hidden;
-      height: 140px;
+      height: 240px; /* sera ajusté par le slider */
       background: #000;
     }
 
@@ -687,6 +695,85 @@
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    /* File viewer */
+
+    .viewer-box {
+      margin-top: 8px;
+      border-top: 1px dashed rgba(74, 98, 151, 0.7);
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .viewer-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-meta {
+      background: rgba(3, 8, 21, 0.96);
+      border-radius: 8px;
+      border: 1px solid rgba(71, 96, 148, 0.95);
+      padding: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      max-height: 100px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .viewer-preview {
+      background: #000;
+      border-radius: 8px;
+      border: 1px solid rgba(71, 96, 148, 0.95);
+      padding: 4px;
+      max-height: 230px;
+      overflow: auto;
+    }
+
+    .viewer-preview iframe,
+    .viewer-preview embed {
+      width: 100%;
+      height: 220px;
+      border: none;
+    }
+
+    .viewer-preview img,
+    .viewer-preview video {
+      max-width: 100%;
+      border-radius: 6px;
+      display: block;
+    }
+
+    .viewer-preview pre {
+      margin: 0;
+      background: #050816;
+      color: var(--text-main);
+      padding: 6px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .viewer-sidecar {
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(71, 96, 148, 0.95);
+      background: rgba(2, 5, 16, 0.98);
+      color: var(--text-main);
+      padding: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      min-height: 120px;
+      resize: vertical;
+      width: 100%;
     }
   </style>
 </head>
@@ -752,7 +839,7 @@
               <div class="view-header-pill" id="viewType">SYSTEM.BOOT</div>
             </div>
             <div class="view-body" id="viewBody">
-              <h1>GHOSTNET v2 // Explorateur fantasmé</h1>
+              <h1>GHOSTNET v3 // Explorateur fantasmé</h1>
               <p>
                 Ici, tout tourne <strong>hors ligne</strong> et en statique : pas de connexion Tor, pas de scan massif,
                 juste un terrain de jeu pour réfléchir et raconter des histoires de réseau sombre.
@@ -763,7 +850,8 @@
               <ul>
                 <li><strong>Noeuds fantômes</strong> : faux sites, faux boards, faux leaks.</li>
                 <li><strong>Archives locales</strong> : tes fichiers Markdown dans <code>/data</code>.</li>
-                <li><strong>Scanner</strong> (panneau de droite) : tu peux y taper une URL et l'ouvrir comme si tu "sondais" le web.</li>
+                <li><strong>Scanner + visionneuse de fichiers</strong> (panneau de droite) :
+                  tu peux y taper une URL ou charger un fichier local.</li>
               </ul>
               <p>
                 Pour que la partie &laquo; Archives locales &raquo; fonctionne, il faut un mini serveur HTTP
@@ -775,16 +863,17 @@ python -m http.server 8000
             </div>
           </section>
 
-          <!-- META + SCANNER -->
+          <!-- META + SCANNER + VIEWER -->
           <aside class="view-meta">
             <div class="view-header">
-              <div class="view-title">Méta / Scanner</div>
+              <div class="view-title">Méta / Scanner / Fichiers</div>
               <div class="view-header-pill" id="metaHeaderMode">IDLE</div>
             </div>
             <div class="meta-grid" id="metaGrid">
               <!-- rempli par JS -->
             </div>
 
+            <!-- Scanner web -->
             <div class="scanner-box">
               <div class="meta-label">Scanner web (safe)</div>
               <div class="meta-note">
@@ -794,10 +883,44 @@ python -m http.server 8000
                 <input id="scanUrlInput" placeholder="https://exemple.org" />
                 <button class="btn" id="scanBtn">probe</button>
               </div>
+              <div class="scanner-size-row">
+                <span class="small-text muted">taille cadre</span>
+                <input type="range" id="scanSizeRange" min="140" max="420" value="240" />
+              </div>
               <div class="scanner-log" id="scanLog"></div>
               <div class="scanner-iframe-wrapper">
                 <iframe class="scanner-iframe" id="scanFrame" sandbox=""></iframe>
               </div>
+            </div>
+
+            <!-- Visionneuse de fichiers -->
+            <div class="viewer-box">
+              <div class="meta-label">Visionneuse de fichiers</div>
+              <div class="meta-note">
+                Sélectionne un fichier (image, PDF, vidéo, audio, texte…) pour l'inspecter.  
+                Les métadonnées sont stockées dans un <strong>sidecar JSON</strong> que tu peux exporter.
+              </div>
+              <div class="viewer-input-row">
+                <label class="btn btn-ghost">
+                  choisir fichier
+                  <input type="file" id="fileInput" />
+                </label>
+                <span class="small-text muted" id="fileNameLabel">aucun fichier</span>
+              </div>
+              <div class="viewer-meta" id="fileMeta">
+                aucun fichier chargé
+              </div>
+              <div class="viewer-preview" id="filePreview">
+                <div class="small-text muted">prévisualisation vide</div>
+              </div>
+              <div class="meta-actions">
+                <button class="btn btn-ghost small-text" id="exportSidecarBtn">exporter sidecar.json</button>
+              </div>
+              <textarea id="fileSidecar" class="viewer-sidecar" spellcheck="false">
+{
+  "info": "sidecar JSON pour tes métadonnées (exif virtuel, notes PDF, tags, etc.)"
+}
+              </textarea>
             </div>
           </aside>
         </div>
@@ -906,7 +1029,8 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
     const state = {
       current: null,
       vaultIndex: { entries: [] },
-      filterTag: null
+      filterTag: null,
+      currentFileNameForSidecar: "sidecar"
     };
 
     // ==== Utils ============================================================
@@ -998,6 +1122,20 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       $("statusAddr").textContent = str;
     }
 
+    function humanSize(bytes) {
+      if (bytes == null) return "n/a";
+      const b = Number(bytes);
+      if (Number.isNaN(b)) return String(bytes);
+      const units = ["B", "KB", "MB", "GB", "TB"];
+      let i = 0;
+      let val = b;
+      while (val >= 1024 && i < units.length - 1) {
+        val /= 1024;
+        i++;
+      }
+      return val.toFixed(1).replace(".0", "") + " " + units[i];
+    }
+
     // ==== Sidebar ==========================================================
     function renderNodesList() {
       const container = $("nodesList");
@@ -1072,7 +1210,7 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
         main.appendChild(sub);
 
         const pill = document.createElement("div");
-        pill.className = "pill pill-muted";
+          pill.className = "pill pill-muted";
         pill.textContent = (entry.tags || []).slice(0, 2).join(", ") || "no tags";
 
         li.appendChild(main);
@@ -1297,7 +1435,7 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       }
     }
 
-    // ==== Export / import ==================================================
+    // ==== Export / import index ============================================
     function exportIndex() {
       const blob = new Blob(
         [JSON.stringify(state.vaultIndex, null, 2)],
@@ -1342,7 +1480,7 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       reader.readAsText(file);
     }
 
-    // ==== Scanner web (safe) ==============================================
+    // ==== Scanner web (taille réglable) ====================================
     function logScan(msg) {
       const logEl = $("scanLog");
       const now = new Date().toISOString().split("T")[1].replace("Z", "");
@@ -1363,6 +1501,8 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       const input = $("scanUrlInput");
       const btn = $("scanBtn");
       const frame = $("scanFrame");
+      const sizeRange = $("scanSizeRange");
+      const wrapper = document.querySelector(".scanner-iframe-wrapper");
 
       btn.addEventListener("click", () => {
         const raw = input.value;
@@ -1381,6 +1521,149 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
           btn.click();
         }
       });
+
+      if (sizeRange && wrapper) {
+        const apply = () => {
+          wrapper.style.height = sizeRange.value + "px";
+        };
+        apply();
+        sizeRange.addEventListener("input", apply);
+      }
+    }
+
+    // ==== Visionneuse de fichiers ==========================================
+    function handleFileSelected(file) {
+      const metaEl = $("fileMeta");
+      const previewEl = $("filePreview");
+      const nameLabel = $("fileNameLabel");
+      const sidecarEl = $("fileSidecar");
+
+      if (!file) {
+        nameLabel.textContent = "aucun fichier";
+        metaEl.textContent = "aucun fichier chargé";
+        previewEl.innerHTML = '<div class="small-text muted">prévisualisation vide</div>';
+        state.currentFileNameForSidecar = "sidecar";
+        return;
+      }
+
+      state.currentFileNameForSidecar = file.name.replace(/\.[^/.]+$/, "") || "sidecar";
+      nameLabel.textContent = file.name;
+
+      const info = [
+        "nom : " + file.name,
+        "type : " + (file.type || "inconnu"),
+        "taille : " + humanSize(file.size) + " (" + file.size + " octets)",
+        "lastModified : " + formatDate(new Date(file.lastModified).toISOString())
+      ].join("\n");
+
+      metaEl.textContent = info;
+
+      const url = URL.createObjectURL(file);
+
+      // preview selon type
+      previewEl.innerHTML = "";
+      const type = (file.type || "").toLowerCase();
+      const nameLower = file.name.toLowerCase();
+
+      if (type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = file.name;
+        previewEl.appendChild(img);
+      } else if (type === "application/pdf" || nameLower.endsWith(".pdf")) {
+        const iframe = document.createElement("iframe");
+        iframe.src = url;
+        previewEl.appendChild(iframe);
+      } else if (type.startsWith("video/")) {
+        const video = document.createElement("video");
+        video.src = url;
+        video.controls = true;
+        previewEl.appendChild(video);
+      } else if (type.startsWith("audio/")) {
+        const audio = document.createElement("audio");
+        audio.src = url;
+        audio.controls = true;
+        previewEl.appendChild(audio);
+      } else if (
+        type.startsWith("text/") ||
+        /\.txt$|\.md$|\.log$/i.test(nameLower)
+      ) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const pre = document.createElement("pre");
+          pre.textContent = e.target.result;
+          previewEl.appendChild(pre);
+        };
+        reader.readAsText(file);
+      } else {
+        const msg = document.createElement("div");
+        msg.className = "small-text muted";
+        msg.textContent = "type non prévisualisable ici (binaire ou format exotique).";
+        previewEl.appendChild(msg);
+      }
+
+      // sidecar JSON pour métadonnées "EXIF/PDF" virtuelles
+      const sidecar = {
+        fileName: file.name,
+        size: file.size,
+        type: file.type || "unknown",
+        lastModified: file.lastModified,
+        exif: {
+          // à éditer à la main
+          cameraMake: "",
+          cameraModel: "",
+          lens: "",
+          iso: "",
+          shutter: "",
+          aperture: "",
+          gps: "",
+          comment: ""
+        },
+        pdf: {
+          title: "",
+          author: "",
+          subject: "",
+          keywords: ""
+        },
+        tags: [],
+        notes: ""
+      };
+      sidecarEl.value = JSON.stringify(sidecar, null, 2);
+    }
+
+    function exportSidecar() {
+      const sidecarEl = $("fileSidecar");
+      let jsonText = sidecarEl.value;
+      try {
+        // on s'assure que c'est du JSON valide
+        const parsed = JSON.parse(jsonText);
+        jsonText = JSON.stringify(parsed, null, 2);
+      } catch {
+        // si ce n'est pas valide, on exporte tel quel (le hacker sait ce qu'il fait)
+      }
+
+      const blob = new Blob([jsonText], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const base = state.currentFileNameForSidecar || "sidecar";
+      a.href = url;
+      a.download = base + ".sidecar.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function initFileViewer() {
+      const input = $("fileInput");
+      const exportBtn = $("exportSidecarBtn");
+
+      input.addEventListener("change", e => {
+        const file = e.target.files && e.target.files[0];
+        handleFileSelected(file);
+      });
+
+      exportBtn.addEventListener("click", exportSidecar);
     }
 
     // ==== Divers ===========================================================
@@ -1403,6 +1686,7 @@ Mais souviens-toi : on n'a pas besoin de science-fiction pour décrire certaines
       });
       $("randomNodeBtn").addEventListener("click", randomNode);
       initScanner();
+      initFileViewer();
     }
 
     document.addEventListener("DOMContentLoaded", init);
